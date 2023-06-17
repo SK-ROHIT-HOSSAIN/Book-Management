@@ -4,7 +4,7 @@
   "description": "\" book managemnt project\"",
   "main": "index.js",
   "scripts": {
-    "start":"nodemon src/index.js",
+    "start": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "\"Pallavi \"",
@@ -12,6 +12,7 @@
   "dependencies": {
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.3.0",
     "nodemon": "^2.0.22",
     "validator": "^13.9.0"
