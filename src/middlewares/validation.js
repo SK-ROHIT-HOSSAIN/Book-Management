@@ -59,4 +59,45 @@ const bookValidation= async (req,res,next)=>{
     return res.status(500).send({status:false, message:err.message});
   }
 }
-module.exports = {userValidations,bookValidation};
+
+const reviewValidation= async (req,res,next)=>{
+  try{
+     const {reviewedBy,reviewedAt,rating} = req.body;
+     if( !reviewedBy||!reviewedAt || !rating )
+     {
+      return res.status(400).json({status:false,message:"required field missing"});
+     }
+     if(req.params.bookId.trim().length!=24 || !(/^[0-9a-fA-F]+$/.test(bookId.trim())))
+     {
+      return res.status(400).json({status:false,message:"Invalid book ID"});
+     }
+     next();
+  }
+  catch(err){
+    return res.status(500).send({status:false, message:err.message});
+  }
+}
+const reviewValidationUpdt= async (req,res,next)=>{
+  try{
+     const {reviewedBy,rating,review} = req.body;
+     if( !reviewedBy || !rating ||!review )
+     {
+      return res.status(400).json({status:false,message:"required field missing"});
+     }
+     if(req.params.bookId.trim().length!=24 || !(/^[0-9a-fA-F]+$/.test(bookId.trim())))
+     {
+      return res.status(400).json({status:false,message:"Invalid book ID"});
+     }
+     if(req.params.reviewId.trim().length!=24 || !(/^[0-9a-fA-F]+$/.test(reviewId.trim()))){
+      return res.status(400).json({status:false,message:"Invalid review ID"});
+     }
+     if(!(rating>=1 && rating<=5)){
+      return res.status(400).json({status:false,message:"rating not in range 1-5"});
+     }
+     next();
+  }
+  catch(err){
+    return res.status(500).send({status:false, message:err.message});
+  }
+}
+module.exports = {userValidations,bookValidation,reviewValidation,reviewValidationUpdt};

@@ -90,7 +90,7 @@ const getBookById = async (req, res) => {
         subcategory: book.subcategory,
         isDeleted: book.isDeleted,
         reviews: reviewsData.length,
-        releasedAt: book.releasedAt,
+        releasedAt: book.releasedAt.toISOString().split('T')[0] ,
         createdAt: book.createdAt,
         updatedAt: book.updatedAt,
         reviewsData: reviewsData
@@ -115,8 +115,13 @@ const getBookById = async (req, res) => {
 
 const updateBookById = async (req, res) => {
     try {
+     
       const { bookId } = req.params;
       const { title, excerpt, releasedAt, ISBN } = req.body;
+      if(bookId.trim().length!=24 || !(/^[0-9a-fA-F]+$/.test(bookId.trim())))
+      {
+       return res.status(400).json({status:false,message:"Invalid User ID"});
+      }
   
       const existingBook = await BookModel.findOne({ _id: req.params.bookId, isDeleted: false });
   
@@ -125,14 +130,14 @@ const updateBookById = async (req, res) => {
       }
 
     // Check if another book already has the updated title
-    const duplicateTitleBook = await BookModel.findOne({ title, _id: { $ne: bookId }, isDeleted: false });
+    const duplicateTitleBook = await BookModel.findOne({ title:title, isDeleted: false });
 
     if (duplicateTitleBook) {
       return res.status(400).json({ status: false, message: "Title already exists for another book" });
     }
 
     // Check if another book already has the updated ISBN
-    const duplicateISBNBook = await BookModel.findOne({ ISBN, _id: { $ne: bookId }, isDeleted: false });
+    const duplicateISBNBook = await BookModel.findOne({ ISBN:ISBN, isDeleted: false });
 
     if (duplicateISBNBook) {
       return res.status(400).json({ status: false, message: "ISBN already exists for another book" });
@@ -140,7 +145,7 @@ const updateBookById = async (req, res) => {
 
       existingBook.title = title;
       existingBook.excerpt = excerpt;
-      existingBook.releasedAt = releasedAt;
+      existingBook.releasedAt = releasedAt ;
       existingBook.ISBN = ISBN;
   
       const updatedBook = await BookModel.findOneAndUpdate({_id:req.params.bookId,isDeleted:false},{$set:{title,ISBN,releasedAt,excerpt}},{new:true},{upsert:true});

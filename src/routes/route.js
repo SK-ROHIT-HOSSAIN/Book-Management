@@ -10,16 +10,16 @@ router.post('/register', Validtn.userValidations,userContrlr.registerUser);
 router.post('/login',userContrlr.login);
 
 //book apis
-router.post('/books', Mid.authenticationMid,Validtn.bookValidation,BookContrl.createBooks);//done
+router.post('/books', Mid.authenticationMid,Mid.authorizationMidd,Validtn.bookValidation,BookContrl.createBooks);//done
 router.get('/books',Mid.authenticationMid,BookContrl.getAllBooks);
-router.get('/books/:bookId',BookContrl.getBookById);
-router.put('/books/:bookId',BookContrl.updateBookById);
-router.delete('/books/:bookId',BookContrl.deleteBookById);
+router.get('/books/:bookId',Mid.authenticationMid,BookContrl.getBookById);
+router.put('/books/:bookId',Mid.authenticationMid,Mid.authorizationMid,BookContrl.updateBookById);
+router.delete('/books/:bookId',Mid.authenticationMid,Mid.authorizationMid,BookContrl.deleteBookById);
 
 //review apis
- router.post('/books/:bookId/review',ReviewCntrl.createReview);
- router.put('/books/:bookId/review/:reviewId',ReviewCntrl.updateReviewById);
- router.delete('/books/:bookId/review/:reviewId',
+ router.post('/books/:bookId/review',Validtn.reviewValidation,ReviewCntrl.createReview);
+ router.put('/books/:bookId/review/:reviewId',Validtn.reviewValidationUpdt,ReviewCntrl.updateReviewById);
+ router.delete('/books/:bookId/review/:reviewId',Validtn.reviewValidation,
  ReviewCntrl.deleteReview);
 
 module.exports = router;
