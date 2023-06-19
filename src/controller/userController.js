@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const validator= require('validator');
 const userModel = require('../models/userModel');
 
 const registerUser = async function (req, res) {
@@ -14,7 +15,14 @@ const registerUser = async function (req, res) {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+    if(!email||!password) {
+      return res.status(400).json({status:false, message:"Invalid email or password"});
+    }
+
+    if(email.trim().length==0 ||!(password.trim().length<=15 && password.trim().length>=8) ||!validator.isEmail(email)){
+      return res.status(400).json({status:false,message: 'Invalid email or password'});
+    }
+
     const regEmail = await userModel.findOne({ email: email });
 
     if (!regEmail) {
@@ -28,6 +36,7 @@ const login = async (req, res) => {
     const token = jwt.sign({ _id: regEmail._id }, "BookManagement", {
       expiresIn: '24h' // Token expiration time (optional)
     });
+    
     res.setHeader('x-api-key',token);
 
     return res.status(200).json({ status: true, data:{token: token }});

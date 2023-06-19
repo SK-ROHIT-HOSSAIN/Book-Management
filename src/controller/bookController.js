@@ -10,11 +10,11 @@ const createBooks = async function (req, res) {
         
         const existingBook = await BookModel.findOne({ title: title });
         if (existingBook) {
-          return res.status(409).json({ status: false, message: "A book with the same title already exists" });
+          return res.status(400).json({ status: false, message: "A book with the same title already exists" });
         }
         const existISBN = await BookModel.findOne({ ISBN: ISBN });
         if (existISBN) {
-          return res.status(409).json({ status: false, message: "A book with the same ISBN already exists" });
+          return res.status(400).json({ status: false, message: "A book with the same ISBN already exists" });
         }
 
         const book = await BookModel.create(data);
@@ -28,7 +28,7 @@ const createBooks = async function (req, res) {
             subcategory: book.subcategory,
             isDeleted: book.isDeleted,
             reviews: book.reviews,
-            releasedAt: book.releasedAt
+            releasedAt: book.releasedAt.toISOString().split('T')[0]
         };
 
         return res.status(201).send({ status: true, message: "succesfully created", data: createdBook });
@@ -40,7 +40,7 @@ const createBooks = async function (req, res) {
 
 const getAllBooks = async (req, res) => {
     try {
-      const { userId, category } = req.query;
+      const { userId, category,subcategory } = req.query;
       const filter = { isDeleted: false };
   
       if (userId) {
@@ -50,32 +50,25 @@ const getAllBooks = async (req, res) => {
       if (category) {
         filter.category = category;
       }
-  
+
+      if(subcategory) {
+        filter.subcategory = subcategory;
+      }  
       const books = await BookModel.find(filter)
-        .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
+        .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1,subcategory:1, releasedAt: 1, reviews: 1 })
         .sort({ title: 1 });
   
-      if (books.length === 0) {
+      if (books[0].length === 0) {
         return res.status(404).json({ status: false, message: "No books found" });
       }
   
-      return res.status(200).json({ status: true, message: "Successfully fetched all books", data: books });
+      return res.status(200).json({ status: true, message: "Books list", data: books });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ status: false, message: "An error occurred while fetching all books" });
+      return res.status(500).json({ status: false, message: error.message });
     }
   };
   
-
-// const getBookById = async function(req, res)  {
-//     try {
-//         const book = await BookModel.findOne({_id:req.params.bookId,isDeleted:false}).select({title:1,excerpt:1,userId:1,category:1,reviews:1,releasedAt:1});
-//         return res.status(200).send({ status: true, message: "success", data: book });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).send({ status: false, message: 'An error occurred while fetching book by id' });
-//     }
-// }
 
 const getBookById = async (req, res) => {
     try {

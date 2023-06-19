@@ -1,3 +1,4 @@
+const bookModel = require('../models/bookModel');
 const UserModel = require('../models/userModel');
 const validator = require('validator');
 
@@ -41,5 +42,21 @@ const userValidations = async function(req,res,next){
         return res.status(500).send({status:false, message:error.message});
     }
 }
-
-module.exports = {userValidations};
+const bookValidation= async (req,res,next)=>{
+  try{
+     const {title,excerpt,userId,ISBN,category,subcategory,releasedAt} = req.body;
+     if(!title || !excerpt||!userId || !ISBN || !category || !subcategory||!releasedAt)
+     {
+      return res.status(400).json({status:false,message:"required field missing"});
+     }
+     if(userId.trim().length!=24 || !(/^[0-9a-fA-F]+$/.test(userId.trim())))
+     {
+      return res.status(400).json({status:false,message:"Invalid User ID"});
+     }
+     next();
+  }
+  catch(err){
+    return res.status(500).send({status:false, message:err.message});
+  }
+}
+module.exports = {userValidations,bookValidation};

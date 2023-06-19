@@ -5,13 +5,13 @@ const BookContrl = require('../controller/bookController');
 const ReviewCntrl = require('../controller/reviewController');
 const Mid = require('../middlewares/authMiddleware');
 const Validtn = require('../middlewares/validation');
-//user api
+//user api //done
 router.post('/register', Validtn.userValidations,userContrlr.registerUser);
 router.post('/login',userContrlr.login);
 
 //book apis
-router.post('/books', Mid.authenticationMid,BookContrl.createBooks);
-router.get('/books',BookContrl.getAllBooks);
+router.post('/books', Mid.authenticationMid,Validtn.bookValidation,BookContrl.createBooks);//done
+router.get('/books',Mid.authenticationMid,BookContrl.getAllBooks);
 router.get('/books/:bookId',BookContrl.getBookById);
 router.put('/books/:bookId',BookContrl.updateBookById);
 router.delete('/books/:bookId',BookContrl.deleteBookById);

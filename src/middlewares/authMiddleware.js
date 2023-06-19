@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const authenticationMid = function (req, res, next) {
     try { 
-      let token = req.headers["x-api-token"]; 
+      let token = req.headers["x-api-key"]; 
       if (!token)
         return res.status(400).send({ status: false, msg: "token must be present" });
    
