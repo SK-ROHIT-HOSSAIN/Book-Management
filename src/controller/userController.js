@@ -11,27 +11,28 @@ const registerUser = async function (req, res) {
         res.status(500).send({status:false,message:error.message})
     }
 }
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const regEmail = await userModel.findOne({ email: email });
 
+    if (!regEmail) {
+      return res.status(404).json({ status: false, message: "Email not found" });
+    }
 
-const login= async (req,res)=>{
-    try{
-        let {email,password} = req.body;
-        let regEmail=await userModel.findOne({email: email});
-        if(!regEmail)
-        {
-            res.status(404).send({status:false, message:"Email not found"});
-        }
-        if(regEmail.password !== password)
-        {
-            res.status(404).send({status:false, message:"Password is incorrect"});
-        }
-        let token= await jwt.sign({_id:regEmail._id},"BookManagement");
-        res.setHeader('x-api-token',token);
-        res.status(200).send({status:true, message:""});
+    if (regEmail.password !== password) {
+      return res.status(401).json({ status: false, message: "Password is incorrect" });
     }
-    catch(err){
-        res.status(500).send({status:false,message:err.message});
-    }
-}
+
+    const token = jwt.sign({ _id: regEmail._id }, "BookManagement", {
+      expiresIn: '24h' // Token expiration time (optional)
+    });
+    res.setHeader('x-api-key',token);
+
+    return res.status(200).json({ status: true, data:{token: token }});
+  } catch (err) {
+    return res.status(500).json({ status: false, message: err.message });
+  }
+};
 
 module.exports = { registerUser,login };
