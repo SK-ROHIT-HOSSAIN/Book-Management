@@ -14,6 +14,7 @@ const registerUser = async function (req, res) {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
     const regEmail = await userModel.findOne({ email: email });
 
     if (!regEmail) {
